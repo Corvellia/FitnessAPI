@@ -1,0 +1,15 @@
+# Ignore appsettings.json
+appsettings.json
+
+# Ignore other common files
+bin/
+obj/
+*.suo
+*.user
+*.sln.docstates
+
+# Ignore local database files (if not needed in repo)
+*.db
+
+# Ignore user-specific files
+.vs/
