@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using FitnessAPI.Models;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<FitnessDevContext>(options =>
@@ -41,6 +42,16 @@ app.MapGet("/api/FilteredWeightLogs/{id}", async (FitnessDevContext db, int id) 
 
     return filteredWeightLog.Any() ? Results.Ok(filteredWeightLog.OrderByDescending(x => x.LogId)) : Results.NotFound();
 
+});
+
+app.MapPost("/api/Login", async (FitnessDevContext db, [FromBody] LoginModel login) =>
+{
+    if(string.IsNullOrEmpty(login.Username) || string.IsNullOrEmpty(login.Password))
+    {
+        return Results.BadRequest("Username and password must be provided.");
+    }
+    var user = await db.Users.FirstOrDefaultAsync(u => u.Username == login.Username && u.Password == login.Password);
+    return user != null ? Results.Ok(user) : Results.Unauthorized();
 });
 
 app.MapPost("/api/users", async (User user, FitnessDevContext db) =>
