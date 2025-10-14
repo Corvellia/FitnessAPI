@@ -17,15 +17,24 @@ namespace FitnessAPI.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("api/Login")]
-        public async Task<ActionResult<LoginModel>> AuthorizedLogin(LoginModel loginRequest)
+        [HttpPost("api/auth/login")]
+        public async Task<ActionResult<string>> AuthorizedLogin([FromBody]string loginRequestJson)
         {
-            var response = await _jwtService.Authenticate(loginRequest);
-            if (response == null)
+            try
             {
-                return Unauthorized("Invalid username or password.");
+                var loginRequest = System.Text.Json.JsonSerializer.Deserialize<LoginModel>(loginRequestJson);
+                var response = await _jwtService.Authenticate(loginRequest);
+                if (response == null)
+                {
+                    return Unauthorized("Invalid username or password.");
+                }
+
+                return Ok(response);
             }
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }
